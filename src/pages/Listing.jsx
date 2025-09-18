@@ -2,15 +2,22 @@ import  { useEffect, useState } from 'react'
 import { useParams } from 'react-router-dom';
 //import { Swiper, SwiperSlide } from 'swiper/react';
 import SwiperCore, { Swiper } from 'swiper';
+import {useSelector} from 'react-redux';
 import { Navigation } from 'swiper/modules';
 import 'swiper/css/bundle';
+import Contact from '../component/contact';
 
 export default function Listing() {
     SwiperCore.use([Navigation]);
     const [listing, setListing] = useState(null);
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState(false);
+    const [copied, setcopied] = useState(false);
+    const [contact, setContact] = useState(false);
     const params = useParams();
+    const {currentUser} = useSelector((state) => state.user);
+    
+    console.log(currentUser._id, listing?.userRef);
      useEffect(() => {
   const fetchListing = async () => {
     try {
@@ -35,11 +42,11 @@ export default function Listing() {
     fetchListing();
      } , [params.listingId]);
 
-     console.log(loading);
+     //console.log(loading);
      
 
    return <main> 
-    {listing && <p className='text-center my-7 text-2xl'>Loading...</p>}
+    {loading && <p className='text-center my-7 text-2xl'>Loading...</p>}
     {error && (<p className='text-center my-7 text-red-500'>Error loading listing</p>)}
     {listing && !loading && !error  && (
        <div>
@@ -111,6 +118,10 @@ h
                      {listing.furnished ? 'Furnished' : 'Unfurnished'} 
                   </li>
                </ul>
+               {currentUser && listing.userRef !== currentUser._id && !contact && ( 
+               <button onClick={()=>setContact(true)} className='bg-slate-700 text-white rounded-lg uppercase 
+               hover:opacity-95 p-3'>Contact Owner</button>)}
+               {contact && <Contact listing={listing}/>}
           </div>
           </div>
     )}
